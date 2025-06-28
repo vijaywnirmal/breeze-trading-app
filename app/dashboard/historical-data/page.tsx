@@ -157,7 +157,7 @@ export default function HistoricalDataPage() {
           <CardHeader>
             <CardTitle>Results</CardTitle>
             <CardDescription>
-              Showing first 5 of {data.Success.length} data points fetched
+              Displaying first 5 of {data.Success.length} data points fetched
             </CardDescription>
           </CardHeader>
           <CardContent>
