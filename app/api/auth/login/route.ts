@@ -52,6 +52,13 @@ export async function POST(request: NextRequest) {
         maxAge: 60 * 60 * 24,
       })
 
+      cookieStore.set("isLoggedIn", "true", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24, // 24 hours
+      })
+      
       return NextResponse.json({
         success: true,
         message: "Login successful",
