@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ function formatDateTime(isoString: string): { date: string; time: string } {
 }
 
 export default function HistoricalDataPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
@@ -73,7 +75,16 @@ export default function HistoricalDataPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="relative container mx-auto px-4 py-8">
+      {/* Back Button - Top Right */}
+      <Button
+        variant="outline"
+        className="absolute top-4 right-4"
+        onClick={() => router.back()}
+      >
+        ← Back
+      </Button>
+
       <Card>
         <CardHeader>
           <CardTitle>Download Historical Data</CardTitle>
@@ -199,53 +210,52 @@ export default function HistoricalDataPage() {
           </CardContent>
         </Card>
       )}
-      <Button
-        className="mt-4"
-        onClick={() => {
-          if (!data?.Success?.length) return
 
-          const headers = [
-            "Date",
-            "Time",
-            "Open",
-            "High",
-            "Low",
-            "Close",
-            "Strike Price",
-            "Volume",
-            "Open Interest"
-          ]
+      {data?.Success?.length > 0 && (
+        <Button
+          className="mt-4"
+          onClick={() => {
+            const headers = [
+              "Date",
+              "Time",
+              "Open",
+              "High",
+              "Low",
+              "Close",
+              "Strike Price",
+              "Volume",
+              "Open Interest"
+            ]
 
-          const rows = data.Success.map((row: Candle) => {
-            const { date, time } = formatDateTime(row.datetime)
-            return [
-              date,
-              time,
-              row.open,
-              row.high,
-              row.low,
-              row.close,
-              row.strike_price,
-              row.volume,
-              row.open_interest
-            ].join(",")
-          })
+            const rows = data.Success.map((row: Candle) => {
+              const { date, time } = formatDateTime(row.datetime)
+              return [
+                date,
+                time,
+                row.open,
+                row.high,
+                row.low,
+                row.close,
+                row.strike_price,
+                row.volume,
+                row.open_interest
+              ].join(",")
+            })
 
-          const csvContent = [headers.join(","), ...rows].join("\n")
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-          const url = URL.createObjectURL(blob)
-
-          const link = document.createElement("a")
-          link.href = url
-          link.setAttribute("download", "historical_data.csv")
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        }}
-      >
-        Download Full CSV
-      </Button>
-
+            const csvContent = [headers.join(","), ...rows].join("\n")
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+            const url = URL.createObjectURL(blob)
+            const link = document.createElement("a")
+            link.href = url
+            link.setAttribute("download", "historical_data.csv")
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+          }}
+        >
+          Download Full CSV
+        </Button>
+      )}
     </div>
   )
 }
